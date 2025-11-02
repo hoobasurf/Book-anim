@@ -1,18 +1,12 @@
 import React from "react";
 
-function EnvironmentSelector({ setEnvironment }) {
-  const environments = ["Savane", "Océan", "Ferme", "Forêt"];
-
+export default function EnvironmentSelector({ setEnvironment }) {
   return (
-    <div>
-      <h2>Choisis un environnement :</h2>
-      {environments.map((env) => (
-        <button key={env} onClick={() => setEnvironment(env)}>
-          {env}
-        </button>
-      ))}
+    <div className="environment-selector">
+      <button onClick={() => setEnvironment("savane")}>Savane</button>
+      <button onClick={() => setEnvironment("ocean")}>Océan</button>
+      <button onClick={() => setEnvironment("ferme")}>Ferme</button>
+      <button onClick={() => setEnvironment("foret")}>Forêt</button>
     </div>
   );
 }
-
-export default EnvironmentSelector;
