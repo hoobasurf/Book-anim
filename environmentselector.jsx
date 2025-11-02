@@ -1,8 +1,8 @@
 import React from "react";
 
-const environments = ["Savane", "Océan", "Ferme", "Forêt"];
+function EnvironmentSelector({ setEnvironment }) {
+  const environments = ["Savane", "Océan", "Ferme", "Forêt"];
 
-export default function EnvironmentSelector({ setEnvironment }) {
   return (
     <div>
       <h2>Choisis un environnement :</h2>
@@ -14,3 +14,5 @@ export default function EnvironmentSelector({ setEnvironment }) {
     </div>
   );
 }
+
+export default EnvironmentSelector;
