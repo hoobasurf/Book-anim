@@ -1,20 +1,11 @@
 import React from "react";
 
-function Animation({ environment, animal, onBack }) {
+export default function Animation({ environment, animal }) {
+  const videoSrc = `/${environment}_${animal}.mp4`;
+
   return (
-    <div>
-      <h2>Animation du {animal}</h2>
-      <video
-        src={`${environment.toLowerCase()}_${animal.toLowerCase()}.mp4`}
-        autoPlay
-        loop
-        controls
-        style={{ maxWidth: "100%", borderRadius: "10px" }}
-      />
-      <br />
-      <button onClick={onBack}>Retour au coloriage</button>
+    <div className="animation">
+      <video src={videoSrc} autoPlay loop controls width="300" />
     </div>
   );
 }
-
-export default Animation;
