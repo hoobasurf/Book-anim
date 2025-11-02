@@ -1,39 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import CanvasDraw from "react-canvas-draw";
 
-function Coloring({ environment, animal, onAnimate }) {
-  const [color, setColor] = useState("#ff0000");
-
-  useEffect(() => {
-    const saved = localStorage.getItem(`${environment}_${animal}`);
-    if (saved) setColor(saved);
-  }, [environment, animal]);
-
-  const saveColor = (c) => {
-    setColor(c);
-    localStorage.setItem(`${environment}_${animal}`, c);
-  };
+export default function Coloring({ environment, animal }) {
+  const [brushColor, setBrushColor] = useState("#ff0000");
 
   return (
-    <div>
-      <h2>Colorie le {animal} :</h2>
-      <div>
-        <button onClick={() => saveColor("#ff0000")}>Rouge</button>
-        <button onClick={() => saveColor("#00ff00")}>Vert</button>
-        <button onClick={() => saveColor("#0000ff")}>Bleu</button>
+    <div className="coloring">
+      <div className="color-buttons">
+        <button onClick={() => setBrushColor("#ff0000")}>Rouge</button>
+        <button onClick={() => setBrushColor("#00ff00")}>Vert</button>
+        <button onClick={() => setBrushColor("#0000ff")}>Bleu</button>
+        <button onClick={() => setBrushColor("#000000")}>Noir</button>
       </div>
-      <div style={{ margin: "20px" }}>
-        <img
-          src={`${environment.toLowerCase()}_${animal.toLowerCase()}.svg`}
-          alt={animal}
-          width="300"
-          style={{
-            filter: `hue-rotate(${color})`,
-          }}
-        />
-      </div>
-      <button onClick={onAnimate}>Voir animation</button>
+
+      <CanvasDraw
+        brushColor={brushColor}
+        brushRadius={5}
+        lazyRadius={0}
+        canvasWidth={300}
+        canvasHeight={300}
+        imgSrc={`/${environment}_${animal}.svg`}
+      />
     </div>
   );
 }
-
-export default Coloring;
