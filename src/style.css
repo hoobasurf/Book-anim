@@ -1,19 +1,24 @@
-body {
-  font-family: sans-serif;
+.app {
+  font-family: Arial, sans-serif;
   text-align: center;
-  background-color: #fdf6e3;
-  margin: 0;
-  padding: 0;
+  padding: 20px;
 }
 
 button {
   margin: 5px;
   padding: 10px 15px;
   font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
-h1, h2 {
-  color: #333;
+.color-buttons button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  margin: 5px;
+}
+
+canvas {
+  border: 1px solid #000;
+  margin-top: 10px;
 }
