@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-export default function Coloring({ environment, animal, onAnimate }) {
+function Coloring({ environment, animal, onAnimate }) {
   const [color, setColor] = useState("#ff0000");
 
   useEffect(() => {
     const saved = localStorage.getItem(`${environment}_${animal}`);
     if (saved) setColor(saved);
-  }, []);
+  }, [environment, animal]);
 
   const saveColor = (c) => {
     setColor(c);
@@ -23,12 +23,17 @@ export default function Coloring({ environment, animal, onAnimate }) {
       </div>
       <div style={{ margin: "20px" }}>
         <img
-          src={`./animals/${environment.toLowerCase()}_${animal.toLowerCase()}.svg`}
+          src={`${environment.toLowerCase()}_${animal.toLowerCase()}.svg`}
           alt={animal}
-          style={{ filter: `hue-rotate(${color})` }}
+          width="300"
+          style={{
+            filter: `hue-rotate(${color})`,
+          }}
         />
       </div>
       <button onClick={onAnimate}>Voir animation</button>
     </div>
   );
 }
+
+export default Coloring;
