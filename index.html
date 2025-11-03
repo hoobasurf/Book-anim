@@ -22,8 +22,6 @@
 
       <button id="startCam">Démarrer la caméra</button>
       <button id="captureBtn" disabled>Prendre la photo</button>
-      <button id="animateBtn" disabled>Animer</button>
-      <button id="downloadBtn" disabled>Télécharger l'image PNG</button>
     </div>
 
     <section class="preview">
@@ -37,21 +35,12 @@
         <div id="threeContainer"></div>
       </div>
     </section>
-
-    <footer>
-      <small>
-        Traitement local : la photo reste dans ton navigateur. Librairies chargées via CDN.
-      </small>
-    </footer>
   </main>
 
   <!-- Three.js depuis jsDelivr -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
-  <!-- OpenCV.js depuis jsDelivr -->
-  <script src="https://cdn.jsdelivr.net/npm/opencv-js@1.4.0/opencv.js"></script>
-
-  <!-- Script principal (compatible iPhone/Safari) -->
+  <!-- Script principal -->
   <script src="script.js" type="module"></script>
 </body>
 </html>
