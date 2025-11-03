@@ -1,7 +1,7 @@
 {
-  "lion": {"move":"marche","headShake":true,"tailSwing":true,"bounce":true},
-  "singe": {"move":"saute","armSwing":true,"dance":true},
-  "dauphin": {"move":"saut","headTurn":true},
-  "vache": {"move":"marche","blink":true},
-  "renard": {"move":"court","tailSwing":true,"bounce":true}
+  "lion": {"move":"marche","headShake":true,"tailSwing":true,"bounce":true, "freq":2.0, "amp":0.06},
+  "singe": {"move":"saute","armSwing":true,"dance":true, "freq":2.6, "amp":0.09},
+  "dauphin": {"move":"saut","headTurn":true, "freq":1.8, "amp":0.07},
+  "vache": {"move":"marche","blink":true, "freq":1.2, "amp":0.03},
+  "renard": {"move":"court","tailSwing":true,"bounce":true, "freq":2.8, "amp":0.08}
 }
