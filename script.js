@@ -21,11 +21,11 @@ startCamBtn.onclick = async () => {
 
 // --- Motions JSON (animaux) ---
 const motions = {
-  lion: { headShake: true, tailSwing: true, bounce: true, walk: true },
-  singe: { armSwing: true, jump: true, walk: true },
-  dauphin: { headTurn: true, jump: true, swim: true },
-  vache: { blink: true, bounce: true, walk: true },
-  renard: { tailSwing: true, bounce: true, run: true }
+  lion: { head: true, tail: true, body: true },
+  singe: { arms: true, body: true },
+  dauphin: { head: true, body: true },
+  vache: { body: true, blink: true },
+  renard: { tail: true, body: true }
 };
 
 // --- Capture et animation ---
@@ -40,77 +40,104 @@ captureBtn.onclick = () => {
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imgData.data;
   for (let i = 0; i < data.length; i += 4) {
-    if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) data[i+3] = 0;
+    if (data[i] > 240 && data[i + 1] > 240 && data[i + 2] > 240) data[i + 3] = 0;
   }
   ctx.putImageData(imgData, 0, 0);
 
   startThreeAnimation(canvas, animalSelect.value);
 };
 
-// --- Animation Three.js avec mouvements naturels ---
+// --- Animation Three.js ---
 function startThreeAnimation(canvas, animal) {
   threeContainer.innerHTML = "";
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, threeContainer.clientWidth / threeContainer.clientHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
   threeContainer.appendChild(renderer.domElement);
 
-  // Lumière
   const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(0,0,10);
+  light.position.set(0, 0, 10);
   scene.add(light);
 
-  // Texture principale (dessin entier)
-  const texture = new THREE.Texture(canvas);
-  texture.needsUpdate = true;
+  const w = canvas.width;
+  const h = canvas.height;
 
-  const geometry = new THREE.PlaneGeometry(4, 4 * canvas.height / canvas.width);
-  const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  // Création des parties fictives pour prototype
+  function createPart(x, y, width, height) {
+    const partCanvas = document.createElement("canvas");
+    partCanvas.width = width;
+    partCanvas.height = height;
+    partCanvas.getContext("2d").drawImage(canvas, x, y, width, height, 0, 0, width, height);
+    const tex = new THREE.Texture(partCanvas);
+    tex.needsUpdate = true;
+    const geo = new THREE.PlaneGeometry(4, 4 * height / width);
+    const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.y = ((h/2 - y - height/2)/h) * 4; // position verticale
+    scene.add(mesh);
+    return mesh;
+  }
+
+  // Découpage fictif
+  const parts = {};
+  switch(animal){
+    case "lion":
+      parts.head = createPart(0, 0, w, h/3);
+      parts.body = createPart(0, h/3, w, h/3);
+      parts.tail = createPart(0, 2*h/3, w, h/3);
+      break;
+    case "singe":
+      parts.arms = createPart(0, 0, w, h/3);
+      parts.body = createPart(0, h/3, w, 2*h/3);
+      break;
+    case "dauphin":
+      parts.head = createPart(0, 0, w, h/2);
+      parts.body = createPart(0, h/2, w, h/2);
+      break;
+    case "vache":
+      parts.body = createPart(0, 0, w, h);
+      break;
+    case "renard":
+      parts.body = createPart(0, 0, w, 2*h/3);
+      parts.tail = createPart(0, 2*h/3, w, h/3);
+      break;
+  }
 
   camera.position.z = 6;
 
-  // Variables pour animation
   let angle = 0;
-
   function animate() {
     requestAnimationFrame(animate);
 
     // --- Animations par animal ---
     switch(animal){
       case "lion":
-        if(motions.lion.walk) mesh.position.x = Math.sin(angle)*0.5;
-        if(motions.lion.bounce) mesh.position.y = Math.sin(angle*2)*0.2;
-        if(motions.lion.headShake) mesh.rotation.z = Math.sin(angle*3)*0.15;
-        if(motions.lion.tailSwing) mesh.rotation.y = Math.sin(angle*4)*0.1;
+        if(parts.head) parts.head.rotation.z = Math.sin(angle*3)*0.2;
+        if(parts.body) parts.body.position.y = Math.sin(angle*2)*0.1;
+        if(parts.tail) parts.tail.rotation.z = Math.sin(angle*4)*0.3;
         break;
       case "singe":
-        if(motions.singe.walk) mesh.position.x = Math.sin(angle*1.5)*0.5;
-        if(motions.singe.jump) mesh.position.y = Math.abs(Math.sin(angle*2))*0.5;
-        if(motions.singe.armSwing) mesh.rotation.z = Math.sin(angle*3)*0.2;
+        if(parts.arms) parts.arms.rotation.z = Math.sin(angle*3)*0.2;
+        if(parts.body) parts.body.position.y = Math.abs(Math.sin(angle*2))*0.2;
         break;
       case "dauphin":
-        if(motions.dauphin.swim) mesh.position.x = Math.sin(angle*2)*0.5;
-        if(motions.dauphin.jump) mesh.position.y = Math.abs(Math.sin(angle*2))*0.5;
-        if(motions.dauphin.headTurn) mesh.rotation.z = Math.sin(angle*3)*0.15;
+        if(parts.head) parts.head.rotation.z = Math.sin(angle*3)*0.15;
+        if(parts.body) parts.body.position.y = Math.abs(Math.sin(angle*2))*0.2;
         break;
       case "vache":
-        if(motions.vache.walk) mesh.position.x = Math.sin(angle)*0.3;
-        if(motions.vache.bounce) mesh.position.y = Math.sin(angle*2)*0.1;
-        if(motions.vache.blink) mesh.rotation.z = Math.sin(angle*4)*0.05;
+        if(parts.body) parts.body.position.y = Math.sin(angle*2)*0.05;
         break;
       case "renard":
-        if(motions.renard.run) mesh.position.x = Math.sin(angle*3)*0.7;
-        if(motions.renard.bounce) mesh.position.y = Math.sin(angle*2)*0.2;
-        if(motions.renard.tailSwing) mesh.rotation.z = Math.sin(angle*4)*0.15;
+        if(parts.body) parts.body.position.y = Math.sin(angle*2)*0.1;
+        if(parts.tail) parts.tail.rotation.z = Math.sin(angle*4)*0.25;
         break;
     }
 
     angle += 0.02;
-    texture.needsUpdate = true;
+    for(let key in parts) parts[key].material.map.needsUpdate = true;
+
     renderer.render(scene, camera);
   }
 
