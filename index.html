@@ -1,11 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlinkBook</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>BlinkBook Réaliste</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>BlinkBook Réaliste</h1>
+
+  <div id="controls">
+    <select id="animalSelect">
+      <option value="lion">Lion</option>
+      <option value="singe">Singe</option>
+      <option value="dauphin">Dauphin</option>
+      <option value="vache">Vache</option>
+      <option value="renard">Renard</option>
+    </select>
+    <button id="startCamera">📸 Prendre photo</button>
+  </div>
+
+  <video id="camera" autoplay playsinline style="display:none;"></video>
+  <canvas id="canvas"></canvas>
+
+  <script src="libs/opencv.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
