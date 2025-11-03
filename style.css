@@ -1,0 +1,20 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #f0f0f0;
+}
+
+#canvas {
+  border: 2px solid #333;
+  margin-top: 10px;
+}
+
+#controls {
+  margin-bottom: 10px;
+}
+
+button, select {
+  padding: 10px;
+  margin: 5px;
+  font-size: 1rem;
+}
