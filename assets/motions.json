@@ -1,0 +1,7 @@
+{
+  "lion": {"move":"marche","headShake":true,"tailSwing":true,"bounce":true},
+  "singe": {"move":"saute","armSwing":true,"dance":true},
+  "dauphin": {"move":"saut","headTurn":true},
+  "vache": {"move":"marche","blink":true},
+  "renard": {"move":"court","tailSwing":true,"bounce":true}
+}
