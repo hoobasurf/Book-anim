@@ -1,115 +1,100 @@
-// script.js — version complète compatible iPhone/Safari
-let video = document.getElementById("video");
-let startCamBtn = document.getElementById("startCam");
-let captureBtn = document.getElementById("captureBtn");
-let animateBtn = document.getElementById("animateBtn");
-let downloadBtn = document.getElementById("downloadBtn");
-let captureCanvas = document.getElementById("captureCanvas");
-let processedCanvas = document.getElementById("processedCanvas");
+// --- Éléments DOM ---
+const video = document.getElementById("video");
+const startCamBtn = document.getElementById("startCam");
+const captureBtn = document.getElementById("captureBtn");
+const captureCanvas = document.getElementById("captureCanvas");
+const processedCanvas = document.getElementById("processedCanvas");
+const threeContainer = document.getElementById("threeContainer");
+const animalSelect = document.getElementById("animal");
 
-let stream = null;
-let cvReady = false;
+let stream;
 
-// --- Étape 1 : attendre le chargement complet d'OpenCV ---
-console.log("⏳ Chargement d'OpenCV...");
-
-function onOpenCvReady() {
-  cvReady = true;
-  console.log("✅ OpenCV est prêt !");
-  alert("✅ OpenCV chargé ! Tu peux maintenant prendre la photo.");
-}
-
-// Safari / iPhone : on vérifie si cv est déjà défini
-if (typeof cv !== "undefined" && cv.ready) {
-  onOpenCvReady();
-} else if (typeof cv !== "undefined") {
-  cv['onRuntimeInitialized'] = onOpenCvReady;
-} else {
-  console.warn("⚠️ OpenCV n'est pas encore chargé, attendre 3-5 secondes...");
-}
-
-// --- Étape 2 : démarrage de la caméra ---
+// --- Étape 1 : Démarrage caméra ---
 startCamBtn.onclick = async () => {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" }, // arrière si possible
-      audio: false
-    });
+    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
     video.srcObject = stream;
     captureBtn.disabled = false;
-    alert("📹 Caméra démarrée ! Tu peux prendre la photo.");
-  } catch (e) {
-    alert("Erreur accès caméra : " + e.message);
-  }
-};
-
-// --- Étape 3 : capture d'image et traitement ---
-captureBtn.onclick = async () => {
-  if (!cvReady) {
-    alert("⏳ OpenCV n’est pas encore prêt, attends quelques secondes !");
-    return;
-  }
-
-  console.log("📸 Capture de la photo...");
-
-  // iPhone : convertir le flux vidéo en image via toDataURL pour éviter cv.imread direct
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = video.videoWidth;
-  tempCanvas.height = video.videoHeight;
-  const tempCtx = tempCanvas.getContext("2d");
-  tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
-
-  // copier dans captureCanvas pour affichage caché
-  captureCanvas.width = tempCanvas.width;
-  captureCanvas.height = tempCanvas.height;
-  const ctx = captureCanvas.getContext("2d");
-  ctx.drawImage(tempCanvas, 0, 0);
-
-  try {
-    // OpenCV.js
-    let src = cv.imread(tempCanvas);
-    let dst = new cv.Mat();
-    let gray = new cv.Mat();
-    let mask = new cv.Mat();
-
-    console.log("🎨 Conversion en niveaux de gris...");
-    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
-
-    console.log("🧹 Seuil binaire pour supprimer le fond blanc...");
-    cv.threshold(gray, mask, 240, 255, cv.THRESH_BINARY_INV);
-
-    console.log("💥 Application du masque...");
-    let rgbaPlanes = new cv.MatVector();
-    cv.split(src, rgbaPlanes);
-    rgbaPlanes.push_back(mask);
-    cv.merge(rgbaPlanes, dst);
-
-    console.log("✅ Affichage du résultat...");
-    processedCanvas.width = dst.cols;
-    processedCanvas.height = dst.rows;
-    cv.imshow(processedCanvas, dst);
-
-    // Nettoyage mémoire
-    src.delete(); dst.delete(); gray.delete(); mask.delete(); rgbaPlanes.delete();
-
-    animateBtn.disabled = false;
-    downloadBtn.disabled = false;
-
   } catch (err) {
-    console.error("❌ Erreur OpenCV :", err);
-    alert("Erreur pendant le traitement d'image (voir console)");
+    alert("Erreur accès caméra : " + err.message);
   }
 };
 
-// --- Étape 4 : Télécharger l'image PNG ---
-downloadBtn.onclick = () => {
-  const link = document.createElement("a");
-  link.download = "dessin.png";
-  link.href = processedCanvas.toDataURL("image/png");
-  link.click();
+// --- Étape 2 : Capture photo et suppression fond blanc ---
+captureBtn.onclick = () => {
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+  captureCanvas.width = vw;
+  captureCanvas.height = vh;
+  processedCanvas.width = vw;
+  processedCanvas.height = vh;
+
+  const ctx = captureCanvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, vw, vh);
+
+  const pctx = processedCanvas.getContext("2d");
+  pctx.clearRect(0, 0, vw, vh);
+
+  // récupère les pixels
+  const imgData = ctx.getImageData(0, 0, vw, vh);
+  const data = imgData.data;
+
+  // rendre le blanc transparent
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
+      data[i+3] = 0; // alpha = 0
+    }
+  }
+
+  pctx.putImageData(imgData, 0, 0);
+
+  // lancer animation 3D
+  startThreeAnimation();
 };
 
-// --- Étape 5 : Bouton Animer (placeholder) ---
-animateBtn.onclick = () => {
-  alert("Animation à venir ! (à implémenter selon l'animal choisi)");
-};
+// --- Étape 3 : Animation 3D avec Three.js ---
+function startThreeAnimation() {
+  // Nettoyer conteneur
+  threeContainer.innerHTML = "";
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, threeContainer.clientWidth / threeContainer.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
+  threeContainer.appendChild(renderer.domElement);
+
+  // Lumière
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(0, 0, 10).normalize();
+  scene.add(light);
+
+  // Texture : image capturée
+  const texture = new THREE.Texture(processedCanvas);
+  texture.needsUpdate = true;
+
+  // Plan pour afficher le dessin
+  const geometry = new THREE.PlaneGeometry(4, 4 * processedCanvas.height / processedCanvas.width);
+  const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+  const plane = new THREE.Mesh(geometry, material);
+  scene.add(plane);
+
+  camera.position.z = 5;
+
+  // Variables pour animation
+  let angle = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    // Rotation légère et rebond
+    plane.rotation.y = Math.sin(angle) * 0.2;
+    plane.position.y = Math.sin(angle * 2) * 0.2;
+    angle += 0.02;
+
+    // mise à jour texture
+    texture.needsUpdate = true;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+}
