@@ -1,28 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>BlinkBook Réaliste</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book-anim — Dessin qui prend vie</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>BlinkBook Réaliste</h1>
+  <main>
+    <h1>Book-anim — Fais bouger le dessin</h1>
 
-  <div id="controls">
-    <select id="animalSelect">
-      <option value="lion">Lion</option>
-      <option value="singe">Singe</option>
-      <option value="dauphin">Dauphin</option>
-      <option value="vache">Vache</option>
-      <option value="renard">Renard</option>
-    </select>
-    <button id="startCamera">📸 Prendre photo</button>
-  </div>
+    <div class="controls">
+      <label for="animal">Choisir l'animal :</label>
+      <select id="animal">
+        <option value="lion">Lion</option>
+        <option value="singe">Singe</option>
+        <option value="dauphin">Dauphin</option>
+        <option value="vache">Vache</option>
+        <option value="renard">Renard</option>
+      </select>
 
-  <video id="camera" autoplay playsinline style="display:none;"></video>
-  <canvas id="canvas"></canvas>
+      <button id="startCam">Démarrer la caméra</button>
+      <button id="captureBtn" disabled>Prendre la photo</button>
+      <button id="animateBtn" disabled>Animer</button>
+      <button id="downloadBtn" disabled>Télécharger l'image PNG</button>
+    </div>
 
-  <script src="libs/opencv.js"></script>
-  <script src="script.js"></script>
+    <section class="preview">
+      <div class="left">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="captureCanvas" style="display:none"></canvas>
+        <canvas id="processedCanvas"></canvas>
+      </div>
+
+      <div class="right">
+        <div id="threeContainer"></div>
+      </div>
+    </section>
+
+    <footer>
+      <small>
+        Traitement local : la photo reste dans ton navigateur. Librairies chargées via CDN.
+      </small>
+    </footer>
+  </main>
+
+  <!-- Three.js depuis jsDelivr -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <!-- OrbitControls optionnel (décommenter si utile) -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script> -->
+
+  <!-- OpenCV.js depuis jsDelivr -->
+  <script async src="https://cdn.jsdelivr.net/npm/opencv-js@1.4.0/opencv.js"></script>
+
+  <script src="script.js" type="module"></script>
 </body>
 </html>
